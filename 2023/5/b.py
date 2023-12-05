@@ -12,8 +12,8 @@ def extract_conversions(lines):
                 b.clear()
         else:
             e,f,g = map(int, line.split())
-            dest = [e, e+g]
-            source = [f, f+g]
+            dest = [e, e+g-1]
+            source = [f, f+g-1]
             b.append((source, dest))
     if b:
         b.sort()
@@ -23,30 +23,30 @@ def extract_conversions(lines):
     return a
 
 def pop_interval(intervals, delval):
-    grabbed = [float('inf'), float('-inf')]
+    popped = []
 
     for i in range(len(intervals)-1, -1, -1):
-        startinside = delval[1] > intervals[i][0] > delval[0]
-        endinside = delval[1] > intervals[i][1] > delval[0]
+        startinside = delval[1] >= intervals[i][0] >= delval[0]
+        endinside = delval[1] >= intervals[i][1] >= delval[0]
+        submerged = (intervals[i][1] >= delval[0] >= intervals[i][0]) and (intervals[i][1] >= delval[1] >= intervals[i][0])
 
-        if startinside and endinside:
-            grabbed[0] = min(grabbed[0], intervals[i][0])
-            grabbed[1] = max(grabbed[1], intervals[i][1])
-            intervals.pop(i)
-            continue
+        if submerged:
+            ii = intervals.pop(i)
+            if ii[0] < delval[0]-1:
+                intervals.append([ii[0], delval[0]-1])
+            if delval[1]+1 < ii[1]:
+                intervals.append([delval[1]+1, ii[1]])
+            popped.append(delval.copy())
+        elif startinside and endinside:
+            popped.append(intervals.pop(i))
         elif endinside:
-            grabbed[0] = min(grabbed[0], delval[0])
-            grabbed[1] = max(grabbed[1], intervals[i][1])
-            intervals[i][1] = delval[0]
+            popped.append([delval[0], intervals[i][1]])
+            intervals[i][1] = delval[0]-1
         elif startinside:
-            grabbed[0] = min(grabbed[0], intervals[i][0])
-            grabbed[1] = max(grabbed[1], delval[1])
-            intervals[i][0] = delval[1]
-        
-        if intervals[i][0] == intervals[i][1]:
-            intervals.pop(i)
-
-    return grabbed
+            popped.append([intervals[i][0], delval[1]])
+            intervals[i][0] = delval[1]+1
+    
+    return popped
 
 
 lines = list(map(lambda x: x.strip(), open('input', 'r').readlines()))
@@ -61,14 +61,15 @@ conversions = extract_conversions(lines[1:])
 intervals = [ [seeds[i], seeds[i]+seeds[i+1]] for i in range(0, len(seeds), 2)]
 
 for i in range(len(conversions)):
+    tmp = []
     for j in range(len(conversions[i])):
         source, dest = conversions[i][j]
         popped = pop_interval(intervals, source)
-        if popped[0] == float('inf'):
-            continue
-        diff1 = popped[0]-source[0]
-        diff2 = popped[1]-source[0]
-        intervals.append([dest[0]+diff1, dest[0]+diff2])
+        for interval in popped:
+            diff1 = interval[0]-source[0]
+            diff2 = interval[1]-source[0]
+            tmp.append([dest[0]+diff1, dest[0]+diff2])
+    intervals.extend(tmp)
 
 intervals.sort()
 best = min(intervals)[0]
