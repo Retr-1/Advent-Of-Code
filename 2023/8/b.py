@@ -1,3 +1,16 @@
+import math
+
+def solve(current):
+    i = 0
+    while True:
+        for x in instructions:
+            if current[2] == 'Z':
+                return i
+
+            mv = 1 if x == 'R' else 0
+            current = graph[current][mv]
+            i += 1
+
 lines = list(map(lambda x: x.strip(), open('input', 'r').readlines()))
 instructions = lines[0]
 graph = {}
@@ -9,25 +22,10 @@ for line in lines[2:]:
     r = r.strip()
     graph[a] = (l,r)
 
-current = []
+everything = []
 for x in graph:
     if x.endswith('A'):
-        current.append(x)
-i = 0
-
-while True:
-    for x in instructions:
-        for y in current:
-            if not y[2] == 'Z': break
-        else:
-            print(i)
-            exit()
-
-        mv = 1 if x == 'R' else 0
-
-        for j in range(len(current)):
-            current[j] = graph[current[j]][mv]
-
-        i += 1
+        everything.append(x)
 
 
+print(math.lcm())
