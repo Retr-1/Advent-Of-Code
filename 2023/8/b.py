@@ -2,12 +2,23 @@ import math
 
 def solve(current):
     i = 0
+    history = []
+    timestamps = []
     while True:
-        for x in instructions:
+        for j in range(len(instructions)):
             if current[2] == 'Z':
-                return i
+                key = (current, j)
+                if key in history:
+                    index = history.index(key)
+                    nonperidic = history[:index]
+                    periodic = history[index:]
+                    period = i - timestamps[index]
+                    start = timestamps[index]
+                    return nonperidic, periodic, period, start
+                history.append(key)
+                timestamps.append(i)
 
-            mv = 1 if x == 'R' else 0
+            mv = 1 if instructions[j] == 'R' else 0
             current = graph[current][mv]
             i += 1
 
@@ -28,4 +39,5 @@ for x in graph:
         everything.append(x)
 
 
-print(math.lcm())
+data = [solve(x) for x in everything]
+print(math.lcm(*map(lambda x: x[2], data)))
