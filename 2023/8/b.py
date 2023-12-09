@@ -1,3 +1,27 @@
+import math
+
+def solve(current):
+    i = 0
+    history = []
+    timestamps = []
+    while True:
+        for j in range(len(instructions)):
+            if current[2] == 'Z':
+                key = (current, j)
+                if key in history:
+                    index = history.index(key)
+                    nonperidic = history[:index]
+                    periodic = history[index:]
+                    period = i - timestamps[index]
+                    start = timestamps[index]
+                    return nonperidic, periodic, period, start
+                history.append(key)
+                timestamps.append(i)
+
+            mv = 1 if instructions[j] == 'R' else 0
+            current = graph[current][mv]
+            i += 1
+
 lines = list(map(lambda x: x.strip(), open('input', 'r').readlines()))
 instructions = lines[0]
 graph = {}
@@ -9,24 +33,11 @@ for line in lines[2:]:
     r = r.strip()
     graph[a] = (l,r)
 
-current = []
+everything = []
 for x in graph:
     if x.endswith('A'):
-        current.append(x)
-i = 0
-
-while True:
-    for x in instructions:
-        mv = 1 if x == 'R' else 0
-        end = True
-        for j in range(len(current)):
-            if current[j][2] != 'Z':
-                end = False
-            current[j] = graph[current[j]][mv]
-        if end:
-            print(i)
-            exit()
-    
-        i += 1
+        everything.append(x)
 
 
+data = [solve(x) for x in everything]
+print(math.lcm(*map(lambda x: x[2], data)))
