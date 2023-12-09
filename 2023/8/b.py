@@ -17,17 +17,16 @@ i = 0
 
 while True:
     for x in instructions:
-        for y in current:
-            if not y[2] == 'Z': break
-        else:
+        mv = 1 if x == 'R' else 0
+        end = True
+        for j in range(len(current)):
+            if current[j][2] != 'Z':
+                end = False
+            current[j] = graph[current[j]][mv]
+        if end:
             print(i)
             exit()
-
-        mv = 1 if x == 'R' else 0
-
-        for j in range(len(current)):
-            current[j] = graph[current[j]][mv]
-
+    
         i += 1
 
 
