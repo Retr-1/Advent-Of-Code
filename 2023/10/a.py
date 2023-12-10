@@ -23,7 +23,7 @@ DIRECTIONS = {
 }
 WIDTH,HEIGHT = len(lines[0]), len(lines)
 SEP = -1
-i = 0
+i = -1
 batch = [start, SEP]
 visited = [ [False]*len(lines[0]) for i in range(len(lines))]
 visited[start[1]][start[0]] = True
@@ -36,13 +36,16 @@ while len(batch) > 0:
         continue
     
     x,y = pos
-    pipe = lines[y][x]
-    for dir in PIPES[pipe]:
-        mvx, mvy = DIRECTIONS[dir]
-        nx,ny = x+mvx, y+mvy
-        if WIDTH > nx >= 0 and HEIGHT > ny >= 0 and not visited[ny][nx]:
+    curr_pipe = lines[y][x]
+    for nx, ny, dir in ((x+1, y, EAST), (x-1, y, WEST), (x, y+1, SOUTH), (x, y-1, NORTH)):
+        if not (WIDTH > nx >= 0 and HEIGHT > ny >= 0):
+            continue
+        next_pipe = lines[ny][nx]
+        if dir in PIPES[curr_pipe] and (dir+2)%4 in PIPES[next_pipe] and not visited[ny][nx]:
             visited[ny][nx] = True
-            batch.append((nx, ny))
+            batch.append((nx,ny))
+
+
 
 print(i)
         
