@@ -1,3 +1,6 @@
+import functools
+
+functools.cache
 def main(construction, schematics, i, j, c):
     if (j==len(schematics) and c>0) or (j<len(schematics) and schematics[j] < c):
         return 0
