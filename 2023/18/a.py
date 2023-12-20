@@ -1,3 +1,5 @@
+from math import ceil
+
 def getInfo(x1, y1, x2, y2):
    return x1*y2 - y1*x2
 
@@ -16,9 +18,9 @@ def solve(points):
    return abs(res)/2.0
 
 
-lines = list(map(lambda x: x.strip(), open('test', 'r').readlines()))
+lines = list(map(lambda x: x.strip(), open('input', 'r').readlines()))
 edging = []
-x = y = 0
+x = y = 0.5
 DIRECTIONS = {
     'L': [-1, 0],
     'R': [1, 0],
@@ -33,4 +35,5 @@ for i in range(len(lines)):
         y += dy
         edging.append((x,y))
 
-print(solve(edging), len(edging))
+print(ceil(solve(edging) + .5*len(edging) + 1))
+# print(solve([[0,0], [1,0], [2,0], [3,0], [3,1], [2,1], [1,1], [0,1]]))
