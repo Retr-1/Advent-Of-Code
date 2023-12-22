@@ -85,8 +85,23 @@ total = 0
 #             break
 #     if suppa:
 #         total += 1
+print('Done1')
+supporting = [set() for i in range(len(blocks))]
+for i in range(len(blocks)):
+    curr_block = blocks[i]
+    curr_block[0][2] += 1
+    curr_block[1][2] += 1
+    for j in range(len(blocks)):
+        if i == j:
+            continue
 
-supporting = [[] for i in range(len(blocks))]
+        if do_3d_boxes_overlap(curr_block, blocks[j]):
+            supporting[i].add(j)
+    curr_block[0][2] -= 1
+    curr_block[1][2] -= 1
+
+
+lying_on = [set() for i in range(len(blocks))]
 for i in range(len(blocks)):
     curr_block = blocks[i]
     curr_block[0][2] -= 1
@@ -96,25 +111,26 @@ for i in range(len(blocks)):
             continue
 
         if do_3d_boxes_overlap(curr_block, blocks[j]):
-            supporting[j].append(i)
+            lying_on[i].add(j) # the things i lies on
     curr_block[0][2] += 1
     curr_block[1][2] += 1
+print('Done2')
 
+def disintegrate(v, removed):
+    t = 0
+    removed.add(v)
+    for x in supporting[v] - removed:
+        if len(lying_on[x] - removed) == 0:
+            t += disintegrate(x, removed) + 1
+    return t
+
+# rm = set()
 for i in range(len(blocks)):
-    good = True
-    for x in supporting[i]:
-        for j in range(len(blocks)):
-            if i == j:
-                continue
+    # if i were to be disintegrated
+    total += disintegrate(i, set())
 
-            if x in supporting[j]:
-                break
-        else:
-            good = False
-
-    if good:
-        total += 1
-
+# print(lying_on)
+# print(supporting)
 
 print(total)
 # while True:
