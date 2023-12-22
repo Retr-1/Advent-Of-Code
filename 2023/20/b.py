@@ -1,4 +1,5 @@
 from collections import defaultdict
+from math import lcm
 
 LOW = False
 HIGH = True
@@ -35,10 +36,33 @@ def push_the_button():
     batch = [('broadcaster', LOW, 'button')]
     while len(batch) > 0:
         name, signal, sender = batch.pop(0)
-        if name == 'rx' and signal == LOW:
-            return True
+
+        if signal == LOW and name in conj_in:
+            # print(signal, modules['lv'][0].ingoing)
+            idx = conj_in.index(name)
+
+
+            # conj_in_times[idx].append(signal)
+            # if not conj_in_period[idx] and len(conj_in_times[idx])%2 == 0:
+            #     half = len(conj_in_times[idx])//2
+            #     if half > 100 and conj_in_times[idx][:half] == conj_in_times[idx][half:]:
+            #         conj_in_period[idx] = half
+            #         print('Period', idx, half, conj_in_times[idx])
+            conj_in_times[idx].append(i)
+            if len(conj_in_times[idx]) == 2:
+                period = conj_in_times[idx][1]-conj_in_times[idx][0]
+                conj_in_period[idx] = period
+
+            if all(conj_in_period):
+                f = 1
+                for x in conj_in_period:
+                    f *= x
+                print(f)
+                # exit()
+
         if not name in modules:
             continue
+
         obj, dest = modules[name]
         response = obj.send(sender, signal)
         if response != NO_RESPONSE:
@@ -77,6 +101,15 @@ for x in modules:
             o.ingoing[y] = False
 
 
+
+conj_in = []
+for x in modules:
+    if 'lv' in modules[x][1]:
+        conj_in.append(x)
+conj_in_times = [[] for i in range(len(conj_in))]
+conj_in_period = [None]*len(conj_in)
+print(conj_in)
+
 i = 0
 while True:
     if push_the_button():
@@ -85,7 +118,7 @@ while True:
     i += 1
 
 
-print(SS[0]*SS[1], SS)
+
 
 """
 0,0,0,0... -> 1,0,1,0,1,0...
