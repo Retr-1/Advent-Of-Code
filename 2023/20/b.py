@@ -37,7 +37,6 @@ def push_the_button():
         name, signal, sender = batch.pop(0)
         if name == 'rx' and signal == LOW:
             return True
-        SS[signal] += 1
         if not name in modules:
             continue
         obj, dest = modules[name]
@@ -50,7 +49,6 @@ def push_the_button():
 
             
 modules = {}
-SS = [0,0] # Signals-Sent
 lines = list(map(lambda x: x.strip(), open('input', 'r').readlines()))
 for line in lines:
     for x in ['%', '&', 'broadcaster']:
