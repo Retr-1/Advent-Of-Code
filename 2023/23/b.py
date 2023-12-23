@@ -6,9 +6,7 @@ def main(x, y, visited, dead_end):
     if (x,y) == end:
         return 1
     
-    fixed = tuple(map(tuple, visited))
-
-    if fixed in dead_end[y][x]:
+    if dead_end[y][x]:
         return float('-inf')
     
     visited[y][x] = True
@@ -21,13 +19,13 @@ def main(x, y, visited, dead_end):
     
     visited[y][x] = False
     if best == float('-inf'):
-        dead_end[y][x].add(fixed)
-
+        dead_end[y][x] = True
+        
     return best + 1
         
 
-lines = list(map(lambda x: x.strip(), open('input', 'r').readlines()))
+lines = list(map(lambda x: x.strip(), open('test', 'r').readlines()))
 W,H = len(lines[0]), len(lines)
 start = (1,0)
 end = (W-2, H-1)
-print(main(1, 0, [[False]*W for i in range(H)], [[set() for i in range(W)] for i in range(H)])-1)
+print(main(1, 0, [[False]*W for i in range(H)], [[False]*W for i in range(H)])-1)
