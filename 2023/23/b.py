@@ -1,6 +1,7 @@
 from sys import setrecursionlimit
 setrecursionlimit(10**8)
 
+
 class Node:
     def __init__(self) -> None:
         self.children = {}
@@ -43,5 +44,8 @@ W,H = len(lines[0]), len(lines)
 start = (1,0)
 end = (W-2, H-1)
 root = Node()
+print(isacyclic(1,0,set()))
+exit()
+
 simplify(1, 0, [], [], root)
 print()
