@@ -13,7 +13,7 @@ class Node:
         self.edges.append(traversed)
 
 
-lines = list(map(lambda x: x.strip(), open('test', 'r').readlines()))
+lines = list(map(lambda x: x.strip(), open('input', 'r').readlines()))
 W,H = len(lines[0]), len(lines)
 start = (1,0)
 end = (W-2, H-1)
@@ -67,17 +67,21 @@ def binpos(x, y):
 
 adj = defaultdict(list)
 
-for x,y in conjunctions:
-    batch = [(x,y,binpos(x,y),1)]
+for sx,sy in conjunctions:
+    batch = [(sx,sy,0,0)]
     while len(batch) > 0:
         x,y,visited,count = batch.pop(0)
 
         for nx,ny in [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]:
             if not (W > nx >= 0 and H > ny >= 0) or lines[ny][nx] == '#' or binpos(nx, ny) & visited:
                 continue
+            
+            if (nx,ny) == (sx,sy):
+                continue
 
             if (nx,ny) in conjunctions:
                 adj[(nx,ny)].append((x,y,visited,count))
+                adj[(sx,sy)].append((nx,ny,visited,count))
                 continue
 
             bp = binpos(nx, ny)
@@ -86,17 +90,25 @@ for x,y in conjunctions:
             
 
 
-def bruteforce(x, y, visited):
+def bruteforce(x, y, visited, visited_conjunctions:set):
+    if (x,y) == end:
+        return 0
+    
+    if (x,y) in visited_conjunctions:
+        return float('-inf')
+    
+    visited_conjunctions.add((x,y))
     neighbors = adj[(x,y)]
-    best = 0
+    best = float('-inf')
     for nx,ny,to_visit,count in neighbors:
-        if visited & to_visit != 0:
-            continue
+        # if visited & to_visit != 0:
+        #     continue
 
-        best = max(best, bruteforce(nx, ny, visited | to_visit) + count)
+        best = max(best, bruteforce(nx, ny, 0, visited_conjunctions) + count)
 
-    return best
+    visited_conjunctions.remove((x,y))
+    return best+1
 
-print(bruteforce(start[0], start[1], 0))
+print(bruteforce(start[0], start[1], 0, set()))
 
     
