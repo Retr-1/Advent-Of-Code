@@ -1,26 +1,48 @@
 from itertools import combinations
 
-def find_intersection(line1, line2):
-    x1, y1, dx1, dy1 = line1
-    x2, y2, dx2, dy2 = line2
+# Python program to find the point of
+# intersection of two lines
 
-    det = dx1 * -dy2 - -dx2 * dy1
+# Class used to used to store the X and Y
+# coordinates of a point respectively
+class Point:
+	def __init__(self, x, y):
+		self.x = x
+		self.y = y
 
-    if det == 0:
+
+def lineLineIntersection(A, B, C, D):
+    # Line AB represented as a1x + b1y = c1
+    a1 = B.y - A.y
+    b1 = A.x - B.x
+    c1 = a1*(A.x) + b1*(A.y)
+
+    # Line CD represented as a2x + b2y = c2
+    a2 = D.y - C.y
+    b2 = C.x - D.x
+    c2 = a2*(C.x) + b2*(C.y)
+
+    determinant = a1*b2 - a2*b1
+
+    if (determinant == 0):
+        # The lines are parallel. This is simplified
+        # by returning a pair of FLT_MAX
         return None
-    
-
-    px = ((x2 - x1) * -dy2 - -dx2*(y2-y1)) / det
-    py = (dx1*(y2-y1) - (x2-x1)*dy1) / det
-
-    return px,py
+    else:
+        x = (b2*c1 - b1*c2)/determinant
+        y = (a1*c2 - a2*c1)/determinant
+        return Point(x, y)
 
 
+# This code is contributed by Saurabh Jaiswal
 
-textlines = map(lambda x: x.strip(), open('input', 'r').readlines())
+
+
+
+textlines = map(lambda x: x.strip(), open('test', 'r').readlines())
 lines = []
-LEFT = 200000000000000
-RIGHT = 400000000000000
+LEFT = 7#200000000000000
+RIGHT = 27#400000000000000
 for textline in textlines:
     a,b = textline.split('@')
     x,y,z = map(int, a.split(','))
@@ -32,11 +54,18 @@ for la, lb in combinations(lines, 2):
     x1,y1,z1,vx1,vy1,vz1 = la
     x2,y2,z2,vx2,vy2,vz2 = lb
 
-    res = find_intersection((x1,y1,vx1,vy1), (x2,y2,vx2,vy2))
+    A = Point(x1,y1)
+    B = Point(x1+vx1, y1+vy1)
+    C = Point(x2,y2)
+    D = Point(x2+vx2,y2+vy2)
+    res = lineLineIntersection(A,B,C,D)
+	
     if not res:
         continue
-    px,py = res
+    px,py = res.x, res.y
+    print(px,py, la,lb)
     if RIGHT >= px >= LEFT and RIGHT >= py >= LEFT:
+        
         total += 1
 
 
