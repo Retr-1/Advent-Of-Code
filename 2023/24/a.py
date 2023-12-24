@@ -1,4 +1,10 @@
 from itertools import combinations
+def sign(x):
+    if x < 0:
+        return -1
+    if x > 0:
+        return 1
+    return 0
 
 # Python program to find the point of
 # intersection of two lines
@@ -39,10 +45,10 @@ def lineLineIntersection(A, B, C, D):
 
 
 
-textlines = map(lambda x: x.strip(), open('test', 'r').readlines())
+textlines = map(lambda x: x.strip(), open('input', 'r').readlines())
 lines = []
-LEFT = 7#200000000000000
-RIGHT = 27#400000000000000
+LEFT = 200000000000000
+RIGHT = 400000000000000
 for textline in textlines:
     a,b = textline.split('@')
     x,y,z = map(int, a.split(','))
@@ -63,10 +69,9 @@ for la, lb in combinations(lines, 2):
     if not res:
         continue
     px,py = res.x, res.y
-    print(px,py, la,lb)
     if RIGHT >= px >= LEFT and RIGHT >= py >= LEFT:
-        
-        total += 1
+        if sign(px - x1) == sign(vx1) and sign(px - x2) == sign(vx2) and sign(py-y1) == sign(vy1) and sign(py-y2) == sign(vy2):
+            total += 1
 
 
         
