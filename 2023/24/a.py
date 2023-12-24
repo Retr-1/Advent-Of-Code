@@ -23,10 +23,17 @@ for la, lb in combinations(lines, 2):
     #         continue
     #     if vy1 == vy2:
     
+        
     
-    
-    tx = (x2 - x1) / (vx1 - vx2)
-    ty = (y2 - y1) / (vy1 - vy2)
+    tx = 0 if vx1 == vx2 else (x2 - x1) / (vx1 - vx2)
+    ty = 0 if vy1 == vy2 else (y2 - y1) / (vy1 - vy2)
+
+    if x1 + vx1*tx == x2 + vx2*tx and y1 + vy1*ty == y2 + vy2*ty:
+        px = x1 + vx1*tx
+        py = y1 + vy1*ty
+
+        if (px == 0 or RIGHT >= px >= LEFT) and (py == 0 or RIGHT >= py >= LEFT):
+            total += 1
 
 
         
