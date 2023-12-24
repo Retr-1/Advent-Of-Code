@@ -1,49 +1,18 @@
 from itertools import combinations
-def sign(x):
-    if x < 0:
-        return -1
-    if x > 0:
-        return 1
-    return 0
 
-# Python program to find the point of
-# intersection of two lines
-
-# Class used to used to store the X and Y
-# coordinates of a point respectively
-class Point:
-	def __init__(self, x, y):
-		self.x = x
-		self.y = y
-
-
-def lineLineIntersection(A, B, C, D):
-    # Line AB represented as a1x + b1y = c1
-    a1 = B.y - A.y
-    b1 = A.x - B.x
-    c1 = a1*(A.x) + b1*(A.y)
-
-    # Line CD represented as a2x + b2y = c2
-    a2 = D.y - C.y
-    b2 = C.x - D.x
-    c2 = a2*(C.x) + b2*(C.y)
-
-    determinant = a1*b2 - a2*b1
-
-    if (determinant == 0):
-        # The lines are parallel. This is simplified
-        # by returning a pair of FLT_MAX
+def find_intersection(line1, line2):
+     x1,y1,dx1,dy1 = line1
+     x2,y2,dx2,dy2 = line2
+     c1,c2 = x2-x1, y2-y1
+     det = dx1 * -dy2 - -dx2*dy1
+     
+     if det == 0:
         return None
-    else:
-        x = (b2*c1 - b1*c2)/determinant
-        y = (a1*c2 - a2*c1)/determinant
-        return Point(x, y)
-
-
-# This code is contributed by Saurabh Jaiswal
-
-
-
+     
+     t1 = (c1*-dy2 - c2*-dx2) / det
+     t2 = (dx1*c2 - c1*dy1) / det
+     px,py = x1 + dx1*t1, y1 + dy1*t1
+     return px,py,t1,t2
 
 textlines = map(lambda x: x.strip(), open('input', 'r').readlines())
 lines = []
@@ -60,18 +29,13 @@ for la, lb in combinations(lines, 2):
     x1,y1,z1,vx1,vy1,vz1 = la
     x2,y2,z2,vx2,vy2,vz2 = lb
 
-    A = Point(x1,y1)
-    B = Point(x1+vx1, y1+vy1)
-    C = Point(x2,y2)
-    D = Point(x2+vx2,y2+vy2)
-    res = lineLineIntersection(A,B,C,D)
-	
+    res = find_intersection((x1,y1,vx1,vy1), (x2,y2,vx2,vy2))
     if not res:
-        continue
-    px,py = res.x, res.y
-    if RIGHT >= px >= LEFT and RIGHT >= py >= LEFT:
-        if sign(px - x1) == sign(vx1) and sign(px - x2) == sign(vx2) and sign(py-y1) == sign(vy1) and sign(py-y2) == sign(vy2):
-            total += 1
+         continue
+    px,py,t1,t2 = res
+    if t1>=0 and t2>=0 and RIGHT >= px >= LEFT and RIGHT >= py >= LEFT:
+         total += 1
+    
 
 
         
