@@ -1,4 +1,5 @@
 from collections import defaultdict
+from random import shuffle
 from sys import setrecursionlimit
 setrecursionlimit(10**6)
 
@@ -45,17 +46,21 @@ def traverse(vertex:str, visited:dict, covisited:set, parent=''):
 
 
 lines = list(map(lambda x: x.strip(), open('input', 'r').readlines()))
-neighbors = defaultdict(set)
 
-for line in lines:
-    a,b = line.split(':')
-    values = b.strip().split()
-    key = a.strip()
-    neighbors[key].update(values)
-    for v in values:
-        neighbors[v].add(key)
+while True:
+    shuffle(lines)
+    neighbors = defaultdict(set)
 
-start = key
-idx = 0
-traverse(start, {}, set())
+    for line in lines:
+        a,b = line.split(':')
+        values = b.strip().split()
+        key = a.strip()
+        neighbors[key].update(values)
+        for v in values:
+            neighbors[v].add(key)
+
+    start = key
+    idx = 0
+    traverse(start, {}, set())
+    # print('d')
 # print(get_size(start, set()))
