@@ -1,0 +1,1 @@
+SELECT meno FROM osoba, pozna WHERE meno = pozna.kto
