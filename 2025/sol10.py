@@ -1,4 +1,5 @@
 from gaussian_elimination import gaussian_elimination
+from math import ceil, floor
 EPS = 10**-6
 
 def solve(line: str):
@@ -51,10 +52,27 @@ def solve(line: str):
         nonlocal best
 
         if idx == -1:
-            total = sum(part)
-            for i in range(n_free):
-                total += sum(free_vars[i])*status[i]
-            best = min(best, total)
+            solution = []
+
+            for i in range(nvars):
+                value = part[i]
+
+                for k in range(n_free):
+                    value += free_vars[k][i] * status[k]
+
+                solution.append(value)
+
+            # všetky počty stlačení musia byť >= 0
+            if any(x < -EPS for x in solution):
+                return
+
+            # všetky musia byť celé čísla
+            if any(abs(x - round(x)) > EPS for x in solution):
+                return
+
+            solution = [round(x) for x in solution]
+
+            best = min(best, sum(solution))
             return
         
 
@@ -62,19 +80,21 @@ def solve(line: str):
         maximum = UPPER_BOUND
         # check bounds
         for i in range(nvars):
+            k = None
             for j in range(n_free):
                 if abs(free_vars[j][i]) > EPS:
+                    k = j
                     break
 
-            
-            if j != idx or abs(free_vars[j][i]) > EPS:
+            if k != idx:
                 continue
-            mult = -free_vars[j][i]
-            total = part[i]*mult
-            for k in range(j+1, n_free):
-                total += free_vars[k][i]*mult*status[k]
 
-            if mult < 0:
+            c = -free_vars[k][i]
+            total = part[i]/c
+            for j in range(k+1, n_free):
+                total += free_vars[j][i]*status[j]/c
+
+            if c < 0:
                 minimum = max(minimum, total)
             else:
                 maximum = min(maximum, total)
@@ -82,7 +102,7 @@ def solve(line: str):
 
         initial_value = status[idx]
 
-        for i in range(int(minimum), int(maximum)+1):
+        for i in range(ceil(minimum - EPS), floor(maximum + EPS)+1):
             status[idx] = i
             recursive(idx-1)
 
