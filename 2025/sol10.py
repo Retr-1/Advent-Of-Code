@@ -1,4 +1,5 @@
 from gaussian_elimination import gaussian_elimination
+EPS = 10**-6
 
 def solve(line: str):
     joltages = {}
@@ -26,27 +27,77 @@ def solve(line: str):
         for row in range(nrows):
             A[row].append(1 if row in button else 0)
 
-    for x in A:
-        print(x)
+    # for x in A:
+    #     print(x)
 
 
-    part, free = gaussian_elimination(A, targets)
-    n_free = len(free)
+    part, free_vars = gaussian_elimination(A, targets)
+    n_free = len(free_vars)
+    nvars = len(buttons)
+
+    # s <= 2+t
+    # t <= 5
+    # s <= 1+t
+    # s >= 0
+    # t <= 3
+    # t >= 0
+    # min: 11 - s + t
+    
+    status = [0] * n_free
+    best = float('inf')
+    UPPER_BOUND = max(targets)+1
+
+    def recursive(idx):
+        nonlocal best
+
+        if idx == -1:
+            total = sum(part)
+            for i in range(n_free):
+                total += sum(free_vars[i])*status[i]
+            best = min(best, total)
+            return
+        
+
+        minimum = 0
+        maximum = UPPER_BOUND
+        # check bounds
+        for i in range(nvars):
+            for j in range(n_free):
+                if abs(free_vars[j][i]) > EPS:
+                    break
+
+            
+            if j != idx or abs(free_vars[j][i]) > EPS:
+                continue
+            mult = -free_vars[j][i]
+            total = part[i]*mult
+            for k in range(j+1, n_free):
+                total += free_vars[k][i]*mult*status[k]
+
+            if mult < 0:
+                minimum = max(minimum, total)
+            else:
+                maximum = min(maximum, total)
+
+
+        initial_value = status[idx]
+
+        for i in range(int(minimum), int(maximum)+1):
+            status[idx] = i
+            recursive(idx-1)
+
+        status[idx] = initial_value
 
     # print(part)
-    # print(*free)
+    # print(*free_vars)
     # print('---')
 
     # print(joltages)
     # print(buttons)
     # print(targets)
 
-    # 11 -2s
-
-    def recursive(used_free:set):
-        for idx, free in enumerate(free):
-            if idx in used_free:
-                continue
+    recursive(n_free-1)
+    return best
 
 
     
@@ -54,11 +105,14 @@ def solve(line: str):
 
 
 result = 0
-with open('input2510e') as f:
-    for line in f.readlines():
-        result += solve(line)
-        print(result)
-        break
+with open('input2510') as f:
+    for i,line in enumerate(f.readlines()):
+        # if i != 1:
+        #     continue
+        r = solve(line)
+        print(i, r)
+        result += r
+        
         
 
 print(result)

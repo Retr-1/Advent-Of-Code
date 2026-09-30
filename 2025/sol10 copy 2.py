@@ -36,7 +36,7 @@ def solve(line: str):
         if len(used_buttons) == len(buttons):
             return
         
-        if best < k:
+        if best < k+min(stats):
             return
 
 
@@ -99,7 +99,7 @@ def solve(line: str):
 
 
 result = 0
-with open('input2510') as f:
+with open('input2510e') as f:
     for line in f.readlines():
         result += solve(line)
         print(result)
